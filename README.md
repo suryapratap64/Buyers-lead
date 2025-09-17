@@ -16,6 +16,19 @@ A full-stack **Buyer Lead Intake App** built with **Next.js (App Router)**, **Ty
 - 📦 CSV import/export support (WIP)  
 
 ---
+## Screenshots
+
+### Homepage
+![Homepage](assets/form.png)
+
+### Buyers Page
+![Buyers Page](assets/leads.png)
+
+### Dashboard
+![Dashboard](assets/dashboard.png)
+
+### Login
+![Login](assets/login.png)
 
 ## 🛠 Tech Stack
 
