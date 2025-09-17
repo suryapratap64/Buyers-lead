@@ -1,4 +1,4 @@
-// app/api/buyers/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { buyerCreateSchema } from "@/lib/validators";

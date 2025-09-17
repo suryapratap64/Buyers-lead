@@ -10,17 +10,14 @@ export const metadata: Metadata = {
 
 const PAGE_SIZE = Number(process.env.NEXT_PUBLIC_PAGE_SIZE ?? 10);
 
-interface SearchParams {
-  [key: string]: string | string[] | undefined;
-}
+type SearchParams = { [key: string]: string | string[] | undefined };
 
-interface PageProps {
-  searchParams: SearchParams;
-}
-
-export default async function BuyersList({ searchParams }: PageProps) {
-  const queryParams = searchParams;
-
+export default async function BuyersList({
+  searchParams = {},
+}: {
+  searchParams?: SearchParams;
+}) {
+  const queryParams = searchParams ?? {};
   const page = Number(queryParams.page ?? "1");
 
   const where: any = {};
@@ -40,15 +37,16 @@ export default async function BuyersList({ searchParams }: PageProps) {
       { phone: { contains: queryParams.q } },
     ];
   }
+
   const total = await prisma.buyer.count({ where });
-  const buyers = (await prisma.buyer.findMany({
+  const buyers = await prisma.buyer.findMany({
     where,
     orderBy: { updatedAt: "desc" },
     skip: (page - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
-  })) as any[];
+  });
 
-  const statusColors = {
+  const statusColors: Record<string, string> = {
     New: "bg-blue-100 text-blue-800",
     Contacted: "bg-yellow-100 text-yellow-800",
     Qualified: "bg-green-100 text-green-800",
@@ -92,7 +90,7 @@ export default async function BuyersList({ searchParams }: PageProps) {
           </div>
         </div>
 
-        {/* Stats Row */}
+        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-200">
           <div className="text-center">
             <div className="text-2xl font-bold text-gray-900">{total}</div>
@@ -119,7 +117,7 @@ export default async function BuyersList({ searchParams }: PageProps) {
         </div>
       </div>
 
-      {/* Leads Table */}
+      {/* Table */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -182,9 +180,8 @@ export default async function BuyersList({ searchParams }: PageProps) {
                   <td className="px-6 py-4">
                     <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        statusColors[
-                          buyer.status as keyof typeof statusColors
-                        ] || "bg-gray-100 text-gray-800"
+                        statusColors[buyer.status] ||
+                        "bg-gray-100 text-gray-800"
                       }`}
                     >
                       {buyer.status}
@@ -209,39 +206,19 @@ export default async function BuyersList({ searchParams }: PageProps) {
 
         {/* Pagination */}
         <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
-          <div className="flex-1 flex justify-between sm:hidden">
-            <a
-              href="#"
-              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Previous
-            </a>
-            <a
-              href="#"
-              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Next
-            </a>
-          </div>
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Showing{" "}
-                <span className="font-medium">
-                  {(page - 1) * PAGE_SIZE + 1}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium">
-                  {Math.min(page * PAGE_SIZE, total)}
-                </span>{" "}
-                of <span className="font-medium">{total}</span> results
-              </p>
-            </div>
-            <div>
-              <span className="text-sm text-gray-700">
-                Page {page} of {Math.ceil(total / PAGE_SIZE)}
-              </span>
-            </div>
+            <p className="text-sm text-gray-700">
+              Showing{" "}
+              <span className="font-medium">{(page - 1) * PAGE_SIZE + 1}</span>{" "}
+              to{" "}
+              <span className="font-medium">
+                {Math.min(page * PAGE_SIZE, total)}
+              </span>{" "}
+              of <span className="font-medium">{total}</span> results
+            </p>
+            <span className="text-sm text-gray-700">
+              Page {page} of {Math.ceil(total / PAGE_SIZE)}
+            </span>
           </div>
         </div>
       </div>
